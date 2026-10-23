@@ -1,29 +1,20 @@
 import { StrictMode, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
+import { Grid2X2, Hammer, HousePlus, KeyRound, Layers2, Wrench } from 'lucide-react'
+import { hasPublishedProjects, projects } from './data/projects'
 import './styles.css'
 
 const WHATSAPP = '56997424200'
 const message = 'Hola David, quisiera solicitar un presupuesto.'
 
 const services = [
-  ['⌂', 'Ampliaciones', 'Más espacio y comodidad para tu hogar.'],
-  ['▣', 'Cerrajería', 'Instalación y reparación de cerraduras.'],
-  ['⌁', 'Gasfitería', 'Reparaciones, instalaciones y soluciones en agua.'],
-  ['⌑', 'Carpintería', 'Muebles a medida, puertas y terminaciones.'],
-  ['◇', 'Cerámicas', 'Instalación de pisos y revestimientos.'],
-  ['▤', 'Pisos flotantes', 'Instalación y reparaciones.'],
+  [HousePlus, 'Ampliaciones', 'Más espacio y comodidad para tu hogar.'],
+  [KeyRound, 'Cerrajería', 'Instalación y reparación de cerraduras.'],
+  [Wrench, 'Gasfitería', 'Reparaciones, instalaciones y soluciones en agua.'],
+  [Hammer, 'Carpintería', 'Muebles a medida, puertas y terminaciones.'],
+  [Grid2X2, 'Cerámicas', 'Instalación de pisos y revestimientos.'],
+  [Layers2, 'Pisos flotantes', 'Instalación y reparaciones.'],
 ]
-// DEMO ONLY: referencias visuales locales para revisar la composición en desarrollo.
-// Sustituir estos registros por proyectos reales con status: 'published' antes de publicar.
-const projects = [
-  { id: 'demo-bano', name: 'Baño residencial renovado', category: 'Remodelación', description: 'Referencia visual temporal para la galería.', images: ['/images/demo-bano.png'], status: 'demo' },
-  { id: 'demo-ampliacion', name: 'Ampliación de vivienda', category: 'Ampliaciones', description: 'Referencia visual temporal para la galería.', images: ['/images/demo-ampliacion.png'], status: 'demo' },
-  { id: 'demo-cocina', name: 'Cocina de líneas cálidas', category: 'Remodelación', description: 'Referencia visual temporal para la galería.', images: ['/images/demo-cocina.png'], status: 'demo' },
-  { id: 'demo-carpinteria', name: 'Mobiliario de madera a medida', category: 'Carpintería', description: 'Referencia visual temporal para la galería.', images: ['/images/demo-carpinteria.png'], status: 'demo' },
-  { id: 'demo-interior', name: 'Interior residencial renovado', category: 'Remodelación', description: 'Referencia visual temporal para la galería.', images: ['/images/demo-interior.png'], status: 'demo' },
-  { id: 'demo-pisos', name: 'Instalación de pisos', category: 'Pisos flotantes', description: 'Referencia visual temporal para la galería.', images: ['/images/demo-pisos.png'], status: 'demo' },
-]
-
 function useActiveSection(ids) {
   const [active, setActive] = useState(ids[0])
   useEffect(() => {
@@ -50,7 +41,7 @@ function WhatsAppButton({ children = 'Solicitar presupuesto', icon = false }) {
 }
 
 function Header() {
-  const ids = ['inicio', 'servicios', 'proyectos', 'sobre-mi', 'contacto']
+  const ids = ['inicio', 'servicios', ...(hasPublishedProjects ? ['proyectos'] : []), 'sobre-mi', 'contacto']
   const active = useActiveSection(ids)
   const [open, setOpen] = useState(false)
   const [dark, setDark] = useState(false)
@@ -68,26 +59,14 @@ function Placeholder({ name, tall = false, image }) { return <div className={`ph
 
 function Hero() { return <section className="hero" id="inicio"><div className="hero-backdrop" role="img" aria-label="Casa moderna entre árboles" /><div className="wrap hero-grid"><div className="reveal hero-content"><p className="eyebrow">Construcción y remodelaciones</p><h1><strong>30 años</strong> de experiencia construyendo soluciones para tu hogar.</h1><p className="lead">Ampliaciones, cerrajería, gasfitería, remodelaciones y más, con un trabajo de calidad y confianza.</p><div className="hero-actions"><WhatsAppButton icon>Solicitar presupuesto</WhatsAppButton></div></div></div></section> }
 
-const serviceImages = {
-  Ampliaciones: '/images/hero-home.png',
-  Gasfitería: '/images/bathroom-remodel.png',
-  Carpintería: '/images/kitchen-cabinet.png',
-}
-
-function ServiceVisual({ title, icon, image }) {
-  return <div className={`service-media${image ? ' has-image' : ' is-placeholder'}`}>
-    {image ? <img src={image} alt={`Servicio de ${title}`} /> : <span className="service-line-icon" aria-hidden="true">{icon}</span>}
-  </div>
-}
-
-function Services() { return <section className="section white" id="servicios"><div className="wrap services-wrap"><SectionHeading eyebrow="Nuestros servicios" title="Soluciones para tu hogar" /><div className="service-grid">{services.map(([icon, title, text]) => <article className="service-card" key={title}><ServiceVisual title={title} icon={icon} image={serviceImages[title]} /><div className="service-copy"><h3>{title}</h3><p>{text}</p></div></article>)}</div></div></section> }
+function Services() { return <section className="section white" id="servicios"><div className="wrap services-wrap"><SectionHeading eyebrow="Nuestros servicios" title="Soluciones para tu hogar" /><div className="service-grid">{services.map(([Icon, title, text]) => <article className="service-card" key={title}><div className="service-copy"><span className="service-icon" aria-hidden="true"><Icon /></span><h3>{title}</h3><p>{text}</p></div></article>)}</div></div></section> }
 
 function SectionHeading({ eyebrow, title, text }) { return <div className="section-heading"><div><p className="eyebrow">{eyebrow}</p><h2>{title}</h2></div>{text && <p>{text}</p>}</div> }
 
 function ProjectCard({ project, onOpen }) {
   const image = project.images[0]
   return <article className={`project-card${image ? '' : ' is-pending'}`}>
-    <button className="project-image" type="button" onClick={() => image && onOpen(project, 0)} disabled={!image} aria-label={image ? `Abrir galería de ${project.name}` : `${project.name}: fotografías pendientes`}>
+    <button className={`project-image project-${project.id}`} type="button" onClick={() => image && onOpen(project, 0)} disabled={!image} aria-label={image ? `Abrir galería de ${project.name}` : `${project.name}: fotografías pendientes`}>
       {image ? <img src={image} alt={project.name} /> : <span className="project-pending-icon" aria-hidden="true">◇</span>}
     </button>
     <div className="project-info"><p className="project-category">{project.category}</p><h3>{project.name}</h3>{project.description && <p>{project.description}</p>}</div>
@@ -129,7 +108,7 @@ function Projects() {
   return <section className="section white" id="proyectos"><div className="wrap projects-wrap"><SectionHeading eyebrow="Proyectos realizados" title="Trabajos que hablan por sí solos" /><div className="projects-grid">{visible.map((project) => <ProjectCard key={project.id} project={project} onOpen={openProject} />)}</div>{hasMore && <div className="center"><button className="btn secondary" onClick={() => setAll((value) => !value)}>{all ? 'Ver menos proyectos' : 'Ver más proyectos'}</button></div>}</div><ProjectLightbox project={selected} index={selectedIndex} onClose={() => setSelected(null)} onChange={setSelectedIndex} /></section>
 }
 
-function About() { return <section className="about white" id="sobre-mi"><div className="wrap about-layout"><div className="about-photo"><img src="/images/kitchen-cabinet.png" alt="Detalle de un proyecto residencial de carpintería" /></div><div className="about-copy"><p className="eyebrow">Trayectoria</p><h2>30 años<span>de experiencia</span></h2><p>Soy David Morales Carreño y cuento con más de 30 años de experiencia en construcción, reparaciones y remodelaciones.</p><p>A lo largo de mi trayectoria he trabajado en proyectos de distintos tamaños, siempre buscando soluciones prácticas, bien ejecutadas y adaptadas a las necesidades de cada cliente.</p></div><div className="values">{[['◇', 'Calidad en cada detalle', 'Trabajos bien ejecutados y con buenos materiales.'], ['♧', 'Compromiso', 'Cumplimiento de tiempos y acuerdos.'], ['♙', 'Trato directo', 'Comunicación clara y atención personalizada.'], ['⌖', 'Región Metropolitana', 'Atención en toda la Región Metropolitana.']].map(([icon, title, text]) => <div key={title}><b><span aria-hidden="true">{icon}</span>{title}</b><small>{text}</small></div>)}</div></div></section> }
+function About() { return <section className="about white" id="sobre-mi"><div className="wrap about-layout"><div className="about-photo"><img src="/images/sobre-mi/david-morales.webp" alt="David Morales Carreño en su taller" /></div><div className="about-copy"><p className="eyebrow">Trayectoria</p><h2>30 años<span>de experiencia</span></h2><p>Soy David Morales Carreño y cuento con más de 30 años de experiencia en construcción, reparaciones y remodelaciones.</p><p>A lo largo de mi trayectoria he trabajado en proyectos de distintos tamaños, siempre buscando soluciones prácticas, bien ejecutadas y adaptadas a las necesidades de cada cliente.</p></div><div className="values">{[['◇', 'Calidad en cada detalle', 'Trabajos bien ejecutados y con buenos materiales.'], ['♧', 'Compromiso', 'Cumplimiento de tiempos y acuerdos.'], ['♙', 'Trato directo', 'Comunicación clara y atención personalizada.'], ['⌖', 'Región Metropolitana', 'Atención en toda la Región Metropolitana.']].map(([icon, title, text]) => <div key={title}><b><span aria-hidden="true">{icon}</span>{title}</b><small>{text}</small></div>)}</div></div></section> }
 
 function Contact() { const [notice, setNotice] = useState(false); useEffect(() => { const show = () => { setNotice(true); setTimeout(() => setNotice(false), 4000) }; window.addEventListener('whatsapp-missing', show); return () => window.removeEventListener('whatsapp-missing', show) }, []); return <section className="contact" id="contacto"><div className="wrap contact-grid"><div className="contact-copy"><p className="eyebrow">Hablemos</p><h2>¿Tienes un proyecto en mente?</h2><p>Cuéntame qué necesitas y conversemos sobre cómo puedo ayudarte a hacerlo realidad.</p><WhatsAppButton icon>Solicitar presupuesto por WhatsApp</WhatsAppButton></div><div className="coverage"><span className="coverage-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="2.5" /></svg></span><div><h3>Región Metropolitana</h3><p>Realizo trabajos en distintas comunas.</p></div></div></div>{notice && <div className="notice" role="status">Configura el número de WhatsApp en <code>src/main.jsx</code> para activar este botón.</div>}</section> }
 
