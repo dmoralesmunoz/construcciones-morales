@@ -3,6 +3,6 @@ dist
 .vercel
 site-upload.zip
 morales.html
-styles.css
+/styles.css
 
 .vercel
