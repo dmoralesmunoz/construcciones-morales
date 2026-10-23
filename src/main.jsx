@@ -1,7 +1,7 @@
 import { StrictMode, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Grid2X2, Hammer, HousePlus, KeyRound, Layers2, Wrench } from 'lucide-react'
-import { hasPublishedProjects, projects } from './data/projects'
+import { hasPublishedProjects, projects } from './data/projects.js'
 import './styles.css'
 
 const WHATSAPP = '56997424200'
